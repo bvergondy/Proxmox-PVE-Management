@@ -1,7 +1,10 @@
 ---
-- name: Update and upgrade the system packages
+- name: Update and upgrade the system packages on Proxmox nodes
   hosts: proxmox_nodes
   become: yes
+  vars:
+    migrate_target_node: "{{ migrate_target_node }}"  # définit le nœud cible pour la migration
+
   tasks:
     - name: Update the apt package index
       ansible.builtin.apt:
@@ -18,6 +21,20 @@
         path: /var/run/reboot-required
       register: reboot_required
 
+    - name: Migrate VMs before reboot (only if needed)
+      ansible.builtin.command:
+        cmd: "qm migrate {{ item }} {{ migrate_target_node }}"
+      loop: "{{ hostvars[inventory_hostname].pve1_vm_ids | default([]) }}"
+      when: reboot_required.stat.exists
+
     - name: Reboot the server if necessary
       ansible.builtin.reboot:
+        msg: "System rebooting for maintenance"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 10
       when: reboot_required.stat.exists
+
+    - name: Confirm all VMs are running after reboot (optional)
+      ansible.builtin.command:
+        cmd: qm list  # Vérification des VMs post-redémarrage
