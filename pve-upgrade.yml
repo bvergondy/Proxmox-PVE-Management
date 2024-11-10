@@ -1,0 +1,14 @@
+---
+- name: Update and upgrade the system packages
+  hosts: proxmox_nodes  # Limite l'exécution à proxmox_nodes
+  become: yes      # Exécute les commandes avec sudo
+  tasks:
+    - name: Update the apt package index
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Upgrade all packages to the latest version
+      ansible.builtin.apt:
+        upgrade: dist
+        autoclean: yes
+        autoremove: yes
