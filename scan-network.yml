@@ -1,17 +1,17 @@
 ---
-- name: Scan network to get machine names
+- name: Scan network using ICMP ping to get machine names
   hosts: all
   gather_facts: no
   tasks:
-    - name: Ping the machine to check if it is reachable
-      ansible.builtin.ping:
+    - name: Check if the machine responds to ICMP ping
+      ansible.builtin.command: ping -c 1 -W 1 {{ inventory_hostname }}
       register: ping_result
       ignore_errors: yes
 
     - name: Gather hostname if the machine is reachable
       ansible.builtin.setup:
         filter: ansible_hostname
-      when: ping_result.ping is defined
+      when: ping_result.rc == 0
       register: host_info
 
     - name: Display hostname
