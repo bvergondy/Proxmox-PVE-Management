@@ -1,0 +1,20 @@
+---
+- name: Scan network to get machine names
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ping the machine to check if it is reachable
+      ansible.builtin.ping:
+      register: ping_result
+      ignore_errors: yes
+
+    - name: Gather hostname if the machine is reachable
+      ansible.builtin.setup:
+        filter: ansible_hostname
+      when: ping_result.ping is defined
+      register: host_info
+
+    - name: Display hostname
+      debug:
+        msg: "IP: {{ inventory_hostname }} - Hostname: {{ host_info.ansible_facts.ansible_hostname }}"
+      when: host_info is defined
