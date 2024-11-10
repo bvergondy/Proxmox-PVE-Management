@@ -1,8 +1,14 @@
 {
-    "PROXMOX_API_URL": "https://proxmox-server-url:8006/api2/json",
+    "PROXMOX_API_URL": "https://proxmox-server:8006/api2/json",
     "USERNAME": "root@pam",
     "PASSWORD": "your_password",
     "VERIFY_SSL": false,
     "ANSIBLE_USER": "your_ansible_user",
-    "DEFAULT_VM_IP_PREFIX": "192.168.1.x"
+    "DEFAULT_VM_IP_PREFIX": "192.168.1.x",
+    "OS_KEYWORDS": {
+        "linux_vms": ["linux", "ubuntu", "debian", "centos"],
+        "windows_vms": ["win", "windows"],
+        "other_vms": []
+    }
 }
+
